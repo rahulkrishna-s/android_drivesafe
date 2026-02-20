@@ -259,7 +259,7 @@ public class EyeTrackingFragment extends Fragment {
                     sessionCriticalCount++;
                 }
 
-            } else if (closedDuration >= 2000) {
+            } else if (closedDuration >= 1000) {
 
                 statusText.setText("WAKE UP!");
                 statusText.setTextColor(Color.YELLOW);
