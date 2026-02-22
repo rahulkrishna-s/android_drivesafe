@@ -1,47 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
-
-    <ImageView
-        android:id="@+id/splashLogo"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_centerInParent="true"
-        android:src="@mipmap/ic_launcher" />
+    android:background="#0B0D17"> <ImageView
+    android:id="@+id/splashLogo"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
+    android:src="@mipmap/ic_launcher"
+    app:layout_constraintBottom_toTopOf="@id/appName"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/splashLogo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="DRIVESAFE AI"
-        android:textColor="#ffffff"
-        android:textSize="28sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.1"
+        android:text="GUARDIANEYE"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/splashLogo" />
+
+    <TextView
+        android:id="@+id/loadingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.08"
+        android:text="INITIALIZING AI TRACKING..."
+        android:textColor="#8E8E93"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@id/loadingBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/loadingBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"
+        android:layout_width="180dp"
+        android:layout_height="3dp"
+        android:layout_marginBottom="64dp"
         android:indeterminate="true"
-        android:indeterminateTint="#808080" />
+        android:indeterminateTint="#007AFF"
+        android:progressBackgroundTint="#1AFFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/loadingBar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp"
-        android:text="Initializing AI Tracking..."
-        android:textColor="#FFFFFF"
-        android:textSize="12sp" />
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

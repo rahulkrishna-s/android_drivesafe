@@ -38,12 +38,12 @@ public class DriveHistoryFragment extends Fragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        sessionsSection  = view.findViewById(R.id.sessionsSection);
+        sessionsSection   = view.findViewById(R.id.sessionsSection);
         sessionsContainer = view.findViewById(R.id.sessionsContainer);
-        speedSection     = view.findViewById(R.id.speedSection);
-        speedContainer   = view.findViewById(R.id.speedContainer);
-        emptyState       = view.findViewById(R.id.emptyState);
-        clearButton      = view.findViewById(R.id.clearButton);
+        speedSection      = view.findViewById(R.id.speedSection);
+        speedContainer    = view.findViewById(R.id.speedContainer);
+        emptyState        = view.findViewById(R.id.emptyState);
+        clearButton       = view.findViewById(R.id.clearButton);
 
         dbHelper = DatabaseHelper.getInstance(requireContext());
 
@@ -85,11 +85,12 @@ public class DriveHistoryFragment extends Fragment {
 
         // Empty state
         emptyState.setVisibility((!hasSessions && !hasAlerts) ? View.VISIBLE : View.GONE);
-        clearButton.setVisibility(( hasSessions ||  hasAlerts) ? View.VISIBLE : View.GONE);
+        clearButton.setVisibility((hasSessions || hasAlerts) ? View.VISIBLE : View.GONE);
 
         // ── Sessions ────────────────────────────────────────────────────────
         sessionsSection.setVisibility(hasSessions ? View.VISIBLE : View.GONE);
         sessionsContainer.removeAllViews();
+
         for (DatabaseHelper.Session session : sessions) {
             View card = layoutInflater.inflate(
                     R.layout.item_session, sessionsContainer, false);
@@ -98,12 +99,19 @@ public class DriveHistoryFragment extends Fragment {
                     .setText(session.formattedStartTime());
             ((TextView) card.findViewById(R.id.sessionDuration))
                     .setText(session.formattedDuration());
+
             ((TextView) card.findViewById(R.id.sessionWarningCount))
                     .setText(String.valueOf(session.fatigueWarningCount));
             ((TextView) card.findViewById(R.id.sessionCriticalCount))
                     .setText(String.valueOf(session.fatigueCriticalCount));
             ((TextView) card.findViewById(R.id.sessionBlinkCount))
                     .setText(String.valueOf(session.blinkCount));
+
+            // --- NEW YAWN & DISTRACTION COUNTS ---
+            ((TextView) card.findViewById(R.id.sessionDistractedCount))
+                    .setText(String.valueOf(session.distractionCount));
+            ((TextView) card.findViewById(R.id.sessionYawnCount))
+                    .setText(String.valueOf(session.yawnCount));
 
             TextView verdict = card.findViewById(R.id.sessionVerdict);
             verdict.setText(session.verdict());
@@ -115,6 +123,7 @@ public class DriveHistoryFragment extends Fragment {
         // ── Speed Alerts ─────────────────────────────────────────────────────
         speedSection.setVisibility(hasAlerts ? View.VISIBLE : View.GONE);
         speedContainer.removeAllViews();
+
         for (DatabaseHelper.SpeedAlert alert : alerts) {
             View row = layoutInflater.inflate(
                     R.layout.item_speed_alert, speedContainer, false);

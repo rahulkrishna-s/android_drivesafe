@@ -18,8 +18,8 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "SafeDriveLogs.db";
-    // Version 3: fix session insert + clean rebuild
-    private static final int DATABASE_VERSION = 3;
+    // Version 4: Added Yawns and Distractions
+    private static final int DATABASE_VERSION = 4;
 
     private static DatabaseHelper sInstance;
 
@@ -45,7 +45,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "DURATION_SECONDS INTEGER DEFAULT 0, " +
                 "FATIGUE_WARNING_COUNT INTEGER DEFAULT 0, " +
                 "FATIGUE_CRITICAL_COUNT INTEGER DEFAULT 0, " +
-                "BLINK_COUNT INTEGER DEFAULT 0)");
+                "BLINK_COUNT INTEGER DEFAULT 0, " +
+                "YAWN_COUNT INTEGER DEFAULT 0, " +
+                "DISTRACTION_COUNT INTEGER DEFAULT 0)");
 
         // Speed limit violations logged independently (GPS always running)
         db.execSQL("CREATE TABLE SpeedAlerts (" +
@@ -57,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop everything and recreate cleanly
+        // Drop everything and recreate cleanly to add the new columns
         db.execSQL("DROP TABLE IF EXISTS Logs");
         db.execSQL("DROP TABLE IF EXISTS Sessions");
         db.execSQL("DROP TABLE IF EXISTS SpeedAlerts");
@@ -84,7 +86,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Finalises the session with all accumulated stats.
      */
     public void endSession(long sessionId, int durationSeconds,
-                           int warningCount, int criticalCount, int blinkCount) {
+                           int warningCount, int criticalCount, int blinkCount,
+                           int yawnCount, int distractionCount) {
         if (sessionId < 0) return;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -93,10 +96,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("FATIGUE_WARNING_COUNT", warningCount);
         values.put("FATIGUE_CRITICAL_COUNT", criticalCount);
         values.put("BLINK_COUNT", blinkCount);
+        values.put("YAWN_COUNT", yawnCount);
+        values.put("DISTRACTION_COUNT", distractionCount);
         db.update("Sessions", values, "ID = ?", new String[]{String.valueOf(sessionId)});
+
         Log.d("DriveSafe-DB", "endSession() updated ID=" + sessionId
                 + " duration=" + durationSeconds + "s warn=" + warningCount
-                + " crit=" + criticalCount + " blinks=" + blinkCount);
+                + " crit=" + criticalCount + " blinks=" + blinkCount
+                + " yawns=" + yawnCount + " distract=" + distractionCount);
     }
 
     /** Returns all completed sessions, newest first. */
@@ -107,8 +114,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             cursor = db.rawQuery(
                     "SELECT ID, START_TIME, END_TIME, DURATION_SECONDS, " +
-                    "FATIGUE_WARNING_COUNT, FATIGUE_CRITICAL_COUNT, BLINK_COUNT " +
-                    "FROM Sessions WHERE END_TIME IS NOT NULL ORDER BY ID DESC", null);
+                            "FATIGUE_WARNING_COUNT, FATIGUE_CRITICAL_COUNT, BLINK_COUNT, " +
+                            "YAWN_COUNT, DISTRACTION_COUNT " +
+                            "FROM Sessions WHERE END_TIME IS NOT NULL ORDER BY ID DESC", null);
+
             Log.d("DriveSafe-DB", "getAllSessions() query returned " + cursor.getCount() + " rows");
             while (cursor.moveToNext()) {
                 Session s = new Session();
@@ -119,6 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 s.fatigueWarningCount = cursor.getInt(4);
                 s.fatigueCriticalCount = cursor.getInt(5);
                 s.blinkCount = cursor.getInt(6);
+                s.yawnCount = cursor.getInt(7);
+                s.distractionCount = cursor.getInt(8);
                 sessions.add(s);
             }
         } finally {
@@ -146,7 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             cursor = db.rawQuery(
                     "SELECT TIME, SPEED_KMH, LIMIT_KMH FROM SpeedAlerts " +
-                    "ORDER BY ID DESC LIMIT 50", null);
+                            "ORDER BY ID DESC LIMIT 50", null);
             while (cursor.moveToNext()) {
                 SpeedAlert a = new SpeedAlert();
                 a.time = cursor.getString(0);
@@ -183,6 +194,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public int fatigueWarningCount;
         public int fatigueCriticalCount;
         public int blinkCount;
+        public int yawnCount;
+        public int distractionCount;
 
         /** Human-readable duration, e.g. "12 min 5 sec" */
         public String formattedDuration() {
@@ -204,15 +217,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         /** Verdict label + colour for the session summary. */
         public String verdict() {
-            if (fatigueCriticalCount > 0) return "Severe drowsiness detected";
-            if (fatigueWarningCount > 0)  return "Mild drowsiness detected";
+            if (fatigueCriticalCount > 0) return "Severe drowsiness detected!";
+            if (distractionCount > 2) return "High distraction levels!";
+            if (fatigueWarningCount > 0 || yawnCount > 2) return "Mild fatigue detected.";
             return "Attentive — great drive!";
         }
 
         public int verdictColor() {
-            if (fatigueCriticalCount > 0) return 0xFFFF4444;
-            if (fatigueWarningCount > 0)  return 0xFFFFAA00;
-            return 0xFF00FF99;
+            if (fatigueCriticalCount > 0) return 0xFFFF4444; // Red
+            if (distractionCount > 2) return 0xFFFF9800; // Orange
+            if (fatigueWarningCount > 0 || yawnCount > 2) return 0xFFFFAA00; // Yellow
+            return 0xFF00FF99; // Neon Green
         }
     }
 

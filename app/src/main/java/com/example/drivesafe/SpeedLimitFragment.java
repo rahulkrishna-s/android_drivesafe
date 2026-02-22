@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Looper;
@@ -65,7 +64,7 @@ public class SpeedLimitFragment extends Fragment {
         speedSlider = view.findViewById(R.id.speedSlider);
 
         dbHelper = DatabaseHelper.getInstance(requireContext());
-        mediaPlayer = MediaPlayer.create(getContext(), R.raw.alarm);
+        mediaPlayer = MediaPlayer.create(getContext(), R.raw.alarm1);
 
         fusedClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 

@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item><shape android:shape="ring" android:thickness="20dp" android:useLevel="false">
-        <solid android:color="#33FF0000" /></shape></item>
-    <item android:top="2dp" android:bottom="2dp" android:left="2dp" android:right="2dp">
+    <item>
+        <shape android:shape="ring" android:thickness="12dp" android:useLevel="false">
+            <solid android:color="#26FF3B30" />
+        </shape>
+    </item>
+
+    <item android:top="4dp" android:bottom="4dp" android:left="4dp" android:right="4dp">
         <shape android:shape="ring" android:thickness="4dp" android:useLevel="false">
-            <solid android:color="#FF0000" /></shape></item>
+            <gradient
+                android:type="sweep"
+                android:startColor="#FF3B30"   android:centerColor="#FF6961" android:endColor="#FF3B30" />
+        </shape>
+    </item>
+
+    <item android:top="8dp" android:bottom="8dp" android:left="8dp" android:right="8dp">
+        <shape android:shape="ring" android:thickness="1dp" android:useLevel="false">
+            <solid android:color="#99FFFFFF" /> </shape>
+    </item>
 </layer-list>

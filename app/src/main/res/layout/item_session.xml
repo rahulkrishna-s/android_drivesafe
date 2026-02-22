@@ -1,161 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Session card — inflated programmatically in DriveHistoryFragment -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#0DFFFFFF"
-    android:padding="16dp"
-    android:layout_marginBottom="10dp">
+    android:layout_marginHorizontal="24dp"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="#151724" app:cardCornerRadius="20dp"
+    app:cardElevation="0dp">
 
-    <!-- Row 1: Date/Time + Duration -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="20dp"> <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/sessionDateTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Feb 18, 2026  2:30 PM"
-            android:textColor="#CCFFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-bold"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            tools:text="Feb 18, 2026 • 2:30 PM" />
 
         <TextView
             android:id="@+id/sessionDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12 min 5 sec"
-            android:textColor="#99FFFFFF"
-            android:textSize="12sp" />
-
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#8E8E93" android:textSize="12sp"
+            tools:text="12m 05s" />
     </LinearLayout>
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#1AFFFFFF"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp" />
-
-    <!-- Row 2: Warning / Critical / Blinks stats -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <!-- Warnings badge -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/sessionWarningCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="#FFAA00"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Warnings"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <!-- Vertical separator -->
         <View
-            android:layout_width="1dp"
-            android:layout_height="36dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
             android:background="#1AFFFFFF" />
 
-        <!-- Critical badge -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:baselineAligned="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/sessionCriticalCount"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="#FF4444"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/sessionWarningCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="#FFD60A" android:textSize="22sp"
+                    tools:text="2" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:text="WARNS"
+                    android:textColor="#8E8E93"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#1AFFFFFF" />
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Critical"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:gravity="center" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/sessionDistractedCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="#FF9500" android:textSize="22sp"
+                    tools:text="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:text="DISTRACT"
+                    android:textColor="#8E8E93"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#1AFFFFFF" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sessionCriticalCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="#FF3B30" android:textSize="22sp"
+                    tools:text="0" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:text="CRITICAL"
+                    android:textColor="#8E8E93"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#1AFFFFFF" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sessionYawnCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="#007AFF" android:textSize="22sp"
+                    tools:text="3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:text="YAWNS"
+                    android:textColor="#8E8E93"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#1AFFFFFF" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sessionBlinkCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="#32D74B" android:textSize="22sp"
+                    tools:text="42" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05"
+                    android:text="BLINKS"
+                    android:textColor="#8E8E93"
+                    android:textSize="9sp" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Vertical separator -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:background="#1AFFFFFF" />
-
-        <!-- Blinks badge -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/sessionVerdict"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:id="@+id/sessionBlinkCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0"
-                android:textColor="#00FF99"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Blinks"
-                android:textColor="#66FFFFFF"
-                android:textSize="11sp"
-                android:gravity="center" />
-
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Attentive — great drive!"
+            android:textColor="#32D74B" android:textSize="13sp" />
 
     </LinearLayout>
-
-    <!-- Row 3: Verdict -->
-    <TextView
-        android:id="@+id/sessionVerdict"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Attentive — great drive!"
-        android:textColor="#00FF99"
-        android:textSize="12sp"
-        android:layout_marginTop="10dp" />
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>
