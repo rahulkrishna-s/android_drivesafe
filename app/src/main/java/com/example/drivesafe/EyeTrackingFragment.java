@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -62,6 +64,7 @@ public class EyeTrackingFragment extends Fragment {
     private Button btnAction;
     private View emergencyOverlay;
     private boolean isPreviewExpanded = false;
+    private boolean isInPipMode = false;
 
     // ─── Core Components ─────────────────────────────────────────────────
     private FaceDetector faceDetector;
@@ -348,7 +351,75 @@ public class EyeTrackingFragment extends Fragment {
         startCamera();
     }
 
-    private void stopMonitoring() {
+    // ─── Public PiP Helpers ─────────────────────────────────────────────
+
+    /** Whether detection is currently running. Used by MainActivity to decide PiP entry. */
+    public boolean isCurrentlyMonitoring() {
+        return isMonitoring.get();
+    }
+
+    /**
+     * Returns the screen-coordinate Rect of the mini camera card.
+     * Used as the source rect hint for the PiP morph animation.
+     */
+    public Rect getPreviewCardRect() {
+        if (aiCard == null) return new Rect();
+        int[] loc = new int[2];
+        aiCard.getLocationInWindow(loc);
+        return new Rect(loc[0], loc[1],
+                loc[0] + aiCard.getWidth(),
+                loc[1] + aiCard.getHeight());
+    }
+
+    /**
+     * Called by MainActivity when PiP mode changes.
+     * Entering PiP: collapse fullscreen if open, hide non-camera UI,
+     *   reparent PreviewView to fill the entire fragment root.
+     * Leaving PiP: restore everything back to normal layout.
+     */
+    public void onPipModeChanged(boolean inPip) {
+        isInPipMode = inPip;
+        View root = getView();
+        if (root == null || previewView == null) return;
+
+        if (inPip) {
+            // Collapse fullscreen overlay first if it was open
+            if (isPreviewExpanded) collapsePreview();
+
+            // Move PreviewView from ai_card → fragment root (fills PiP window)
+            aiCard.removeView(previewView);
+            ((ViewGroup) root).addView(previewView,
+                    new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT));
+            previewView.setElevation(300); // Above everything
+
+            // Hide all non-camera UI
+            aiCard.setVisibility(View.GONE);
+            if (statusCircleFrame != null) statusCircleFrame.setVisibility(View.GONE);
+            if (btnAction != null) btnAction.setVisibility(View.GONE);
+            if (emergencyOverlay != null) emergencyOverlay.setVisibility(View.GONE);
+            // statsContainer is a sibling in the ConstraintLayout
+            View stats = root.findViewById(R.id.statsContainer);
+            if (stats != null) stats.setVisibility(View.GONE);
+        } else {
+            // Restore PreviewView back into ai_card
+            previewView.setElevation(0);
+            ((ViewGroup) root).removeView(previewView);
+            aiCard.addView(previewView, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT));
+
+            // Show all UI again
+            aiCard.setVisibility(View.VISIBLE);
+            if (statusCircleFrame != null) statusCircleFrame.setVisibility(View.VISIBLE);
+            if (btnAction != null) btnAction.setVisibility(View.VISIBLE);
+            View stats = root.findViewById(R.id.statsContainer);
+            if (stats != null) stats.setVisibility(View.VISIBLE);
+        }
+    }
+
+    void stopMonitoring() {
         isMonitoring.set(false);
 
         if (sessionId >= 0) {
@@ -771,10 +842,10 @@ public class EyeTrackingFragment extends Fragment {
             smsManager.sendTextMessage(emergencyNumber, null, message, null, null);
             Log.d(Constants.TAG, "SOS SMS sent to " + emergencyNumber);
 
-            // Show emergency dialog on UI thread
+            // Show emergency dialog on UI thread (skip in PiP — dialogs crash there)
             final String displayNumber = emergencyNumber;
             activity.runOnUiThread(() -> {
-                if (!isAdded() || getContext() == null) return;
+                if (!isAdded() || getContext() == null || isInPipMode) return;
                 new android.app.AlertDialog.Builder(ctx,
                         android.R.style.Theme_DeviceDefault_Dialog_Alert)
                         .setTitle(R.string.sos_dialog_title)
