@@ -47,6 +47,7 @@ public class SettingsFragment extends Fragment {
     private ShapeableImageView ivProfilePhoto;
     private TextInputEditText etUserName;
     private EditText etEmergencyNumber;
+    private ImageButton btnBack;
 
     // ─── Detection Sensitivity ───────────────────────────────────────────
     private MaterialButtonToggleGroup toggleSensitivity;
@@ -116,6 +117,7 @@ public class SettingsFragment extends Fragment {
                 Constants.PREFS_NAME, Context.MODE_PRIVATE);
 
         // ─── Bind all views ──────────────────────────────────────────────
+        btnBack           = view.findViewById(R.id.btnBack);
         ivProfilePhoto    = view.findViewById(R.id.ivProfilePhoto);
         etUserName        = view.findViewById(R.id.etUserName);
         etEmergencyNumber = view.findViewById(R.id.etEmergencyNumber);
@@ -150,13 +152,11 @@ public class SettingsFragment extends Fragment {
         tvVolumePercent.setText(String.format(getString(R.string.volume_format), (int) volume));
 
         // Alarm sound
-        selectedSound = prefs.getString(
-                Constants.KEY_ALARM_SOUND, Constants.DEFAULT_ALARM_SOUND);
+        selectedSound = prefs.getString(Constants.KEY_ALARM_SOUND, Constants.DEFAULT_ALARM_SOUND);
         tvSelectedSound.setText("Selected: " + selectedSound);
 
         // Sensitivity
-        selectedSensitivity = prefs.getString(
-                Constants.KEY_SENSITIVITY, Constants.DEFAULT_SENSITIVITY);
+        selectedSensitivity = prefs.getString(Constants.KEY_SENSITIVITY, Constants.DEFAULT_SENSITIVITY);
         applySensitivityUI(selectedSensitivity);
 
         // Smart Detection
@@ -169,7 +169,6 @@ public class SettingsFragment extends Fragment {
         minSpeedSliderContainer.setVisibility(minSpeedEnabled ? View.VISIBLE : View.GONE);
 
         float minSpeed = prefs.getFloat(Constants.KEY_MIN_SPEED_KMH, Constants.DEFAULT_MIN_SPEED_KMH);
-        // Round to nearest step for slider
         float minSpeedClamped = Math.max(5, Math.min(50, Math.round(minSpeed / 5.0f) * 5.0f));
         sliderMinSpeed.setValue(minSpeedClamped);
         tvMinSpeedLabel.setText(String.format(getString(R.string.min_speed_format), minSpeedClamped));
@@ -187,11 +186,18 @@ public class SettingsFragment extends Fragment {
 
         // ─── Listeners ──────────────────────────────────────────────────
 
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> {
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        }
+
         ivProfilePhoto.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
         btnSelectSound.setOnClickListener(v -> showSoundDialog());
         btnPreviewSound.setOnClickListener(v -> playPreviewSound(selectedSound));
 
-        // Volume slider: live update label + device alarm stream volume
         sliderVolume.addOnChangeListener((slider, value, fromUser) -> {
             tvVolumePercent.setText(String.format(getString(R.string.volume_format), (int) value));
             if (fromUser) {
@@ -199,7 +205,6 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // Sensitivity toggle
         toggleSensitivity.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (!isChecked) return;
             if (checkedId == R.id.btnSensLow) {
@@ -214,26 +219,22 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        // Smart Detection master toggle with animation
         switchSmartDetection.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ViewGroup parent = (ViewGroup) smartDetectionContent.getParent().getParent();
             TransitionManager.beginDelayedTransition(parent);
             smartDetectionContent.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        // Min speed sub-toggle
         switchMinSpeed.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ViewGroup parent = (ViewGroup) minSpeedSliderContainer.getParent();
             TransitionManager.beginDelayedTransition(parent);
             minSpeedSliderContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        // Min speed slider label
         sliderMinSpeed.addOnChangeListener((slider, value, fromUser) ->
                 tvMinSpeedLabel.setText(String.format(getString(R.string.min_speed_format), value))
         );
 
-        // Save button
         btnSaveSettings.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.btn_click));
@@ -250,8 +251,6 @@ public class SettingsFragment extends Fragment {
         super.onDestroyView();
         releasePreviewPlayer();
     }
-
-    // ─── Sensitivity UI Helper ───────────────────────────────────────────
 
     private void applySensitivityUI(String sensitivity) {
         int checkedId;
@@ -274,8 +273,6 @@ public class SettingsFragment extends Fragment {
         tvSensitivityDesc.setText(descRes);
     }
 
-    // ─── Volume / AudioManager ───────────────────────────────────────────
-
     private void applyDeviceVolume(float percent) {
         Context ctx = getContext();
         if (ctx == null) return;
@@ -286,8 +283,6 @@ public class SettingsFragment extends Fragment {
         am.setStreamVolume(AudioManager.STREAM_ALARM, targetVol, 0);
     }
 
-    // ─── Sound Preview ───────────────────────────────────────────────────
-
     private void playPreviewSound(String soundName) {
         releasePreviewPlayer();
         Context ctx = getContext();
@@ -297,13 +292,11 @@ public class SettingsFragment extends Fragment {
         previewPlayer = MediaPlayer.create(ctx, resId);
         if (previewPlayer == null) return;
 
-        // Apply current volume slider value
         float vol = sliderVolume.getValue() / 100f;
         previewPlayer.setVolume(vol, vol);
         previewPlayer.setOnCompletionListener(mp -> releasePreviewPlayer());
         previewPlayer.start();
 
-        // Auto-stop after 3 seconds if still playing
         handler.postDelayed(this::releasePreviewPlayer, 3000);
     }
 
@@ -327,14 +320,11 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    // ─── Save Settings ───────────────────────────────────────────────────
-
     private void saveSettings() {
         boolean isDarkMode = switchTheme.isChecked();
 
         SharedPreferences.Editor editor = prefs.edit();
 
-        // Profile
         if (etUserName.getText() != null) {
             editor.putString(Constants.KEY_PROFILE_NAME,
                     etUserName.getText().toString().trim());
@@ -342,15 +332,12 @@ public class SettingsFragment extends Fragment {
         editor.putString(Constants.KEY_EMERGENCY_NUMBER,
                 etEmergencyNumber.getText().toString().trim());
 
-        // Preferences
         editor.putFloat(Constants.KEY_ALARM_VOLUME, sliderVolume.getValue());
         editor.putString(Constants.KEY_ALARM_SOUND, selectedSound);
         editor.putBoolean(Constants.KEY_DARK_MODE, isDarkMode);
 
-        // Sensitivity
         editor.putString(Constants.KEY_SENSITIVITY, selectedSensitivity);
 
-        // Smart Detection
         editor.putBoolean(Constants.KEY_SMART_DETECTION_ENABLED,
                 switchSmartDetection.isChecked());
         editor.putBoolean(Constants.KEY_MIN_SPEED_ENABLED,
@@ -361,7 +348,6 @@ public class SettingsFragment extends Fragment {
 
         editor.apply();
 
-        // Apply device volume
         applyDeviceVolume(sliderVolume.getValue());
 
         AppCompatDelegate.setDefaultNightMode(isDarkMode
@@ -369,11 +355,8 @@ public class SettingsFragment extends Fragment {
                 : AppCompatDelegate.MODE_NIGHT_NO);
 
         Toast.makeText(getContext(), R.string.settings_saved, Toast.LENGTH_SHORT).show();
-
         getParentFragmentManager().popBackStack();
     }
-
-    // ─── Sound Picker Dialog ─────────────────────────────────────────────
 
     private void showSoundDialog() {
         String[] sounds = {"Sound 1", "Sound 2", "Sound 3", "Sound 4"};
@@ -387,13 +370,11 @@ public class SettingsFragment extends Fragment {
                 .setSingleChoiceItems(sounds, checkedItem, (dialog, which) -> {
                     selectedSound = sounds[which];
                     tvSelectedSound.setText("Selected: " + selectedSound);
-                    // Play a preview of the selected sound
                     playPreviewSound(selectedSound);
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) ->
                         releasePreviewPlayer())
                 .setOnDismissListener(dialog -> {
-                    // Stop preview after a short delay if dialog dismissed
                     handler.postDelayed(this::releasePreviewPlayer, 3000);
                 })
                 .show();

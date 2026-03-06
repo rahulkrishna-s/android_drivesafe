@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DriveSafe</string>
+    <string name="app_name">SafeDrive</string>
 
     <!-- Eye Tracking Status -->
     <string name="status_offline">OFFLINE</string>

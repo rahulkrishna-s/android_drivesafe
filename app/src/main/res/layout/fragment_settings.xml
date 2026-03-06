@@ -4,31 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0B0D17" android:fillViewport="true">
+    android:background="#0B0D17"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="24dp"
-        android:paddingTop="32dp"
+        android:paddingTop="16dp"
         android:paddingBottom="40dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/headerSettings"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-black"
-            android:letterSpacing="0.05"
-            android:text="SETTINGS"
-            android:textColor="#FFFFFF"
-            android:textSize="28sp"
-            android:layout_marginBottom="24dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="Back"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.05"
+                android:text="SETTINGS"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="PROFILE"
-            android:textColor="#8E8E93" android:textSize="12sp"
+            android:textColor="#8E8E93"
+            android:textSize="12sp"
             android:letterSpacing="0.1"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="8dp"/>
@@ -36,7 +56,8 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#151724" app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="#151724"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             android:layout_marginBottom="24dp">
 
@@ -54,7 +75,8 @@
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_gallery"
                     app:shapeAppearanceOverlay="@style/CircleImage"
-                    app:strokeColor="#007AFF" app:strokeWidth="2dp"
+                    app:strokeColor="#007AFF"
+                    app:strokeWidth="2dp"
                     android:padding="2dp"
                     android:clickable="true"
                     android:focusable="true"/>
@@ -120,7 +142,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@null"
-                    android:textColor="#007AFF" android:textColorHint="#555555"
+                    android:textColor="#007AFF"
+                    android:textColorHint="#555555"
                     android:hint="+91 Mobile Number"
                     android:inputType="phone"
                     android:textSize="18sp"
@@ -345,8 +368,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- ─── SMART DETECTION ─────────────────────────────────────── -->
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -379,8 +400,8 @@
                     android:textSize="16sp"
                     android:fontFamily="sans-serif-medium"
                     android:padding="16dp"
-                    app:thumbTint="#FF9500"
-                    app:trackTint="#33FF9500"/>
+                    app:thumbTint="#007AFF"
+                    app:trackTint="#33007AFF"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -405,7 +426,6 @@
                         android:background="#1AFFFFFF"
                         android:layout_marginHorizontal="16dp"/>
 
-                    <!-- Min Speed -->
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switchMinSpeed"
                         android:layout_width="match_parent"
@@ -416,8 +436,8 @@
                         android:fontFamily="sans-serif-medium"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="12dp"
-                        app:thumbTint="#FF9500"
-                        app:trackTint="#33FF9500"/>
+                        app:thumbTint="#007AFF"
+                        app:trackTint="#33007AFF"/>
 
                     <LinearLayout
                         android:id="@+id/minSpeedSliderContainer"
@@ -463,7 +483,6 @@
                         android:background="#1AFFFFFF"
                         android:layout_marginHorizontal="16dp"/>
 
-                    <!-- Largest Face -->
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/switchLargestFace"
                         android:layout_width="match_parent"
@@ -474,8 +493,8 @@
                         android:fontFamily="sans-serif-medium"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="12dp"
-                        app:thumbTint="#FF9500"
-                        app:trackTint="#33FF9500"/>
+                        app:thumbTint="#007AFF"
+                        app:trackTint="#33007AFF"/>
 
                     <TextView
                         android:layout_width="match_parent"

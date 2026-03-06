@@ -20,6 +20,15 @@ public final class Constants {
     public static final String KEY_DARK_MODE = "dark_mode";
     public static final String KEY_SPEED_LIMIT = "speed_limit";
 
+    // New Key for Speed Alert Toggle logic
+    public static final String KEY_SPEED_ALERT_ENABLED = "speed_alert_enabled";
+
+    // ─── Notification Constants ──────────────────────────────────────────
+    // Centralized IDs for GuardianEye status messages
+    public static final String CHANNEL_ID = "GuardianEye_Channel";
+    public static final String CHANNEL_NAME = "GuardianEye Status Service";
+    public static final int NOTIFICATION_ID = 1001;
+
     // Sensitivity preference key & values
     public static final String KEY_SENSITIVITY = "detection_sensitivity";
     public static final String SENSITIVITY_LOW = "low";
@@ -40,32 +49,16 @@ public final class Constants {
     public static final float DEFAULT_MIN_SPEED_KMH = 10.0f;
 
     // ─── Eye Tracking Thresholds ─────────────────────────────────────────
-    /** Eye Aspect Ratio below this value = eyes are closed */
     public static final float EAR_THRESHOLD = 0.25f;
-
-    /** Duration (ms) of closed eyes before WARNING ("WAKE UP!") */
     public static final long WARNING_DURATION_MS = 1000L;
-
-    /** Duration (ms) of closed eyes before CRITICAL ("PULL OVER!") */
     public static final long CRITICAL_DURATION_MS = 10_000L;
-
-    /** Head turn angle (degrees) beyond which the driver is looking away */
     public static final float HEAD_TURN_THRESHOLD = 25f;
-
-    /** Head tilt angle (degrees) below which the driver is nodding off */
     public static final float HEAD_TILT_THRESHOLD = -20f;
-
-    /** Mouth-to-nose gap as fraction of face height to detect yawning */
     public static final float YAWN_RATIO = 0.35f;
-
-    /** Duration (ms) driver must be looking away before distraction fires */
     public static final long DISTRACTION_DURATION_MS = 2000L;
-
-    /** Window (ms) for measuring blink rate — one minute */
     public static final long BLINK_RATE_WINDOW_MS = 60_000L;
 
     // ─── Speed Tracking ──────────────────────────────────────────────────
-    /** Minimum interval (ms) between logging speed violations to DB */
     public static final long SPEED_LOG_COOLDOWN_MS = 30_000L;
 
     // ─── Logging Tag ─────────────────────────────────────────────────────
@@ -73,10 +66,6 @@ public final class Constants {
 
     // ─── Sensitivity Helpers ─────────────────────────────────────────────
 
-    /**
-     * Returns the EAR threshold for the given sensitivity preset.
-     * Low = tolerant (0.20), Medium = balanced (0.25), High = aggressive (0.30).
-     */
     public static float getEarThreshold(String sensitivity) {
         if (sensitivity == null) return EAR_THRESHOLD;
         switch (sensitivity) {
@@ -86,10 +75,6 @@ public final class Constants {
         }
     }
 
-    /**
-     * Returns the warning duration (ms) for the given sensitivity preset.
-     * Low = 2s (slower trigger), Medium = 1s, High = 0.5s (faster trigger).
-     */
     public static long getWarningDuration(String sensitivity) {
         if (sensitivity == null) return WARNING_DURATION_MS;
         switch (sensitivity) {

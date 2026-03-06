@@ -35,7 +35,9 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -128,9 +130,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         bottomNav.setOnItemSelectedListener(item -> {
-            // Use popBackStackImmediate to avoid race condition:
-            // popBackStack() is async, so hide/show below would execute
-            // before the pop completes, causing visual glitches.
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 getSupportFragmentManager().popBackStackImmediate();
             }
@@ -157,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-                // Directional slide animation
                 if (targetIndex > currentIndex) {
                     ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                 } else {
@@ -177,20 +175,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPermissionsAndGps() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
+        List<String> permissionsNeeded = new ArrayList<>();
 
+        // Base critical permissions
+        permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissionsNeeded.add(Manifest.permission.CAMERA);
+        permissionsNeeded.add(Manifest.permission.SEND_SMS);
+
+        // Add Notification Permission for Android 13+ (API 33)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionsNeeded.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+        for (String perm : permissionsNeeded) {
+            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(perm);
+            }
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                            Manifest.permission.CAMERA,
-                            Manifest.permission.SEND_SMS
-                    }, 101);
+                    listPermissionsNeeded.toArray(new String[0]), 101);
         } else {
             checkGpsEnabled();
         }
@@ -216,19 +223,24 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            checkGpsEnabled();
+        if (requestCode == 101) {
+            boolean allGranted = true;
+            for (int res : grantResults) {
+                if (res != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            if (allGranted) {
+                checkGpsEnabled();
+            } else {
+                Toast.makeText(this, "Permissions are required for SafeDrive AI to function.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     // ─── Picture-in-Picture ──────────────────────────────────────────────
 
-    /**
-     * Called when the user presses Home or Recents.
-     * If detection is active and device supports PiP, enter PiP mode
-     * with a smooth animation from the mini camera card.
-     */
     @Override
     public void onUserLeaveHint() {
         super.onUserLeaveHint();
@@ -239,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
         EyeTrackingFragment eyeFrag = (EyeTrackingFragment) eyeFragment;
         if (!eyeFrag.isCurrentlyMonitoring()) return;
 
-        // Build a "Stop Monitoring" remote action for the PiP controls
         Intent stopIntent = new Intent(ACTION_STOP_MONITORING);
         stopIntent.setPackage(getPackageName());
         PendingIntent pendingStop = PendingIntent.getBroadcast(
@@ -268,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
                                               @NonNull Configuration newConfig) {
         super.onPictureInPictureModeChanged(isInPipMode, newConfig);
 
-        // Toggle chrome visibility
         View bottomNav = findViewById(R.id.bottom_navigation);
         View topBar = findViewById(R.id.topBar);
         View navDivider = findViewById(R.id.navDivider);
@@ -278,7 +288,6 @@ public class MainActivity extends AppCompatActivity {
         if (topBar != null) topBar.setVisibility(vis);
         if (navDivider != null) navDivider.setVisibility(vis);
 
-        // Notify fragment to reparent PreviewView
         if (eyeFragment instanceof EyeTrackingFragment) {
             ((EyeTrackingFragment) eyeFragment).onPipModeChanged(isInPipMode);
         }
